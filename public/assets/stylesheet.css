@@ -1,0 +1,93 @@
+/* Global */
+input,
+select,
+button,
+button:active {
+    border: none !important;
+    outline: none !important;
+}
+
+html,
+body,
+.root {
+    height: 100%;
+}
+
+.app {
+    padding: 3rem 2rem 1rem 2rem;
+}
+
+@media screen and (max-width: 320px) {
+    .app {
+        padding: 3rem 0.5rem 1rem 0.5rem;
+    }
+}
+
+@keyframes rotate {
+    50% {
+        transform: rotate(90deg);
+    }
+
+    100% {
+        transform: rotate(180deg);
+    }
+}
+
+.swapper {
+    background-color: transparent !important;
+}
+
+.swapper:active {
+    animation-name: rotate;
+    animation-duration: 0.4s;
+}
+
+
+/*  Light Theme */
+input,
+select {
+    background-color: #F3E9DD;
+    color: #212121;
+}
+
+.app {
+    background-color: #DAB88B;
+}
+
+.light-switcher {
+    top: 25px;
+    left: 25px;
+    color: #F3E9DD;
+    background-color: #323232;
+}
+
+.light-switcher:hover {
+    border: 1px solid #323232 !important;
+}
+
+.light-switcher:active {
+    color: #F3E9DD !important;
+    background-color: #323232 !important;
+    border: none !important;
+}
+
+/* Dark Theme */
+.dark,
+input.dark,
+select.dark {
+    color: #F3E9DD;
+    background-color: #212121;
+}
+
+.app.dark {
+    background-color: #323232;
+}
+
+.light-switcher.dark {
+    background-color: #F3E9DD;
+    color: #212121;
+}
+
+.swapper.dark {
+    color: #DAB88B !important;
+}
