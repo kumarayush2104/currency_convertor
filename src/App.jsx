@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ThreeDots } from 'react-loader-spinner';
 
 export default function App() {
@@ -13,7 +13,7 @@ export default function App() {
 
   const handle_amount_input = (value) => {
     try {
-      const new_amount = parseFloat(value);
+      const new_amount = parseFloat(value) || NaN;
       set_amount(new_amount);
     }
     catch (e) { }
@@ -26,7 +26,7 @@ export default function App() {
 
   const parse_date = () => {
     const new_date = new Date(exchange_currency_data.date);
-    return new_date.toLocaleDateString(undefined, {year: 'numeric', month: 'long', day: 'numeric'});
+    return new_date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
   }
 
   const parse_currency_data = () => {
@@ -44,16 +44,16 @@ export default function App() {
         set_error(false);
         const exchange_currency_request = await fetch(`https://api.frankfurter.app/latest?amount=${amount}&from=${from_currency}&to=${to_currency}`, { signal: api_signal });
         const new_exchange_currency_data = await exchange_currency_request.json();
-        set_exchange_currency_data(new_exchange_currency_data);
+        if (new_exchange_currency_data.rates) set_exchange_currency_data(new_exchange_currency_data);
       } catch (e) {
-        if(e.name === "AbortError") return;
+        if (e.name === "AbortError") return;
         set_error(e.message);
       } finally {
         set_loading(false);
       }
     }
 
-    if (!isNaN(amount) || amount < 1) exchange_currency();
+    amount && exchange_currency();
     return () => {
       api_controller.abort();
       set_loading(false);
@@ -69,7 +69,7 @@ export default function App() {
 
       <div className={`d-flex flex-column align-items-center rounded-4 app ${dark_mode ? "dark" : ""}`}>
         <h2 className="text-center">Currency Convertor</h2>
-        <input className="p-2 my-5 rounded" type="number" min="0" value={isNaN(amount) ? "" : amount} onChange={(e) => handle_amount_input(e.target.value)} />
+        <input className="p-2 my-5 rounded" type="number" min="0" value={amount} onChange={(e) => handle_amount_input(e.target.value)} />
         <select className="p-2 my-2 rounded" value={from_currency} onChange={(e) => set_from_currency(e.target.value)}>
           <option value="CAD">Canadian Dollar</option>
           <option value="CNY">Chinese Yuan</option>
@@ -94,19 +94,16 @@ export default function App() {
           <option value="USD">United States Dollar</option>
         </select>
 
-        {
-          error ? <div className="my-4">{error}</div> :
-            isNaN(amount) || !exchange_currency_data ? <></>
-              : loading ? <ThreeDots visible={true} height="120" width="80" color="#ffffff" radius="9" ariaLabel="three-dots-loading" />
-                : <>
-                  <div className="my-3">
-                    <h5 className="text-center">{amount} {from_currency} </h5>
-                    <h3 className="text-center">{parse_currency_data()} {to_currency}</h3>
-                  </div>
-                  <p className="align-self-start last-updated fs-6 fst-italic">Last Updated: {parse_date()}</p>
-                </>
-        }
+        {loading && <ThreeDots visible={true} height="120" width="80" color="#ffffff" radius="9" ariaLabel="three-dots-loading" />}
+        {!loading && error && <div className="my-4">{error}</div>}
 
+        {!loading && !error && exchange_currency_data && <>
+          <div className="my-3">
+            <h5 className="text-center">{isNaN(amount) ? 0 : amount} {from_currency} </h5>
+            <h3 className="text-center">{isNaN(amount) ? 0 : parse_currency_data()} {to_currency}</h3>
+          </div>
+          <p className="align-self-start last-updated fs-6 fst-italic">Last Updated: {parse_date()}</p>
+        </>}
       </div>
     </div>
   )
